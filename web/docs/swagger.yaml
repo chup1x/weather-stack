@@ -1,0 +1,77 @@
+openapi: 3.0.3
+info:
+  title: Weather Profile API
+  version: v1
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /profile/register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterUserResponse'
+        '422':
+          description: Validation error
+
+  /profile/{id}:
+    get:
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '400':
+          description: Invalid UUID
+        '404':
+          description: Not found
+
+components:
+  schemas:
+    RegisterUserRequest:
+      type: object
+      required: [login, name, sex, age, city]
+      properties:
+        login: { type: string }
+        name: { type: string }
+        sex: { type: string, enum: [male, female] }
+        age: { type: integer, minimum: 1 }
+        city: { type: string }
+
+    RegisterUserResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+
+    GetUserResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        login: { type: string }
+        name: { type: string }
+        sex: { type: string }
+        age: { type: integer }
+        city: { type: string }
+        telegram_id: { type: integer, format: int64 }
+        created_at: { type: string, format: date-time }
