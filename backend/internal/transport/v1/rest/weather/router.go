@@ -15,5 +15,8 @@ func RegisterWeatherRoutes(router fiber.Router, db *gorm.DB) {
 	{
 		//weather.Post("/", weatherCntrl.CreateWeatherRecordHandler)
 		weather.Get("/weather", weatherCntrl.GetWeatherHistoryHandler)
+		weather.Get("/weather/clothes", weatherCntrl.GetWeatherClothesHandler)
+
+		weather.Get("/news", weatherCntrl.GetNewsHandler)
 	}
 }
