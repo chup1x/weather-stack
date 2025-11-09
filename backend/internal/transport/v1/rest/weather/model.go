@@ -1,7 +1,7 @@
 package weathercntrl
 
 type GetWeatherHistoryRequest struct {
-	ID int `param:"city_w" validate:"required"`
+	City_w string `param:"city_w" validate:"required"`
 }
 
 type GetWeatherHistoryResponse struct {
@@ -9,7 +9,7 @@ type GetWeatherHistoryResponse struct {
 }
 
 type GetWeatherClothesRequest struct {
-	ID string `json:"combination" validate:"required"`
+	user string `json:"user" validate:"required"`
 }
 
 type GetWeatherClothesResponse struct {
@@ -17,7 +17,7 @@ type GetWeatherClothesResponse struct {
 }
 
 type GetNewsRequest struct {
-	ID string `json:"city_n" validate:"required"`
+	city_n string `json:"city_n" validate:"required"`
 }
 
 type GetNewsResponse struct {
