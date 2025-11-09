@@ -40,7 +40,7 @@ func (s *WeatherService) CreateWeatherRecord(ctx context.Context, new *domain.We
 	return nil
 }
 
-func (s *WeatherService) GetWeather(ctx context.Context, city string) ([]*domain.WeatherEntity, error) {
+func (s *WeatherService) GetWeather(ctx context.Context, city string) (*domain.WeatherEntity, error) {
 	weather, err := s.repo.GetWeatherByCity(ctx, city)
 	if err != nil {
 		return nil, fmt.Errorf("to select a weather by city: %w", err)
