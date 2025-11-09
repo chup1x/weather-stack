@@ -19,12 +19,12 @@ func (r *WetherRepository) CreateWeatherRequest(ctx context.Context, new *domain
 	return r.db.WithContext(ctx).Table("weather_requests").Create(new).Error
 }
 
-func (r *WetherRepository) GetWeatherRequestByUserID(ctx context.Context, id domain.UserID) ([]*domain.WeatherRequestEntity, error) {
-	weatherRequests := []*domain.WeatherRequestEntity{}
+func (r *WetherRepository) GetWeatherByCity(ctx context.Context, city string) ([]*domain.WeatherEntity, error) {
+	weather := []*domain.WeatherEntity{}
 
-	if err := r.db.WithContext(ctx).Table("weather_requests").Find(&weatherRequests).Error; err != nil {
+	if err := r.db.WithContext(ctx).Table("weather_requests").Find(&weather).Error; err != nil {
 		return nil, err
 	}
 
-	return weatherRequests, nil
+	return weather, nil
 }
