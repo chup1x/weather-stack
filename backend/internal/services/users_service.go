@@ -30,11 +30,11 @@ func NewUserService(repo userStorage) *UserService {
 	return &UserService{users: repo}
 }
 
-func (s *UserService) CreateUser(ctx context.Context, new *domain.UserEntity) (domain.UserID, error) {
-	newID := uuid.New()
-	new.ID = domain.UserID{UUID: newID}
+func (s *UserService) CreateUser(ctx context.Context, new *domain.UserEntity) (uuid.UUID, error) {
+	new.ID = uuid.New()
+
 	if err := s.users.Create(ctx, new); err != nil {
-		return domain.UserID{}, fmt.Errorf("to create a user: %w", err)
+		return uuid.Nil, fmt.Errorf("to create a user: %w", err)
 	}
 	return new.ID, nil
 }

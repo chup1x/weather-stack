@@ -13,7 +13,7 @@ type GetWeatherHistoryResponse struct {
 }
 
 type GetWeatherClothesRequest struct {
-	user int64 `json:"telegram_id" validate:"required"`
+	User int64 `json:"telegram_id" validate:"required"`
 }
 
 type GetWeatherClothesResponse struct {
@@ -21,7 +21,7 @@ type GetWeatherClothesResponse struct {
 }
 
 type GetNewsRequest struct {
-	city_n string `json:"city_n" validate:"required"`
+	CityN string `json:"city_n" validate:"required"`
 }
 
 type GetNewsResponse struct {

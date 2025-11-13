@@ -20,7 +20,6 @@ type weatherProvider interface {
 type weatherStorage interface {
 	weatherCreater
 	weatherProvider
-	//userProvider
 }
 
 type WeatherService struct {
@@ -47,6 +46,7 @@ func (s *WeatherService) GetWeather(ctx context.Context, city string) (*domain.W
 	}
 	return weather, nil
 }
+
 /*
 func (s *WeatherService) GetWeatherClothes(ctx context.Context, id int64) (*domain.WeatherClothesEntity, error) {
 	//comb, err := s.repo.SelectByTelegramID(ctx, id)

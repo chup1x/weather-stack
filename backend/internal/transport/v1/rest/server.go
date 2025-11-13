@@ -38,9 +38,9 @@ func (s *Server) Start(_ context.Context, cfg *config.Config) error {
 		return fmt.Errorf("to connect to postgres: %w", err)
 	}
 
-	if err := database.PostgresMigrations(db); err != nil {
-		return fmt.Errorf("to apply migrations: %w", err)
-	}
+	// if err := database.PostgresMigrations(db); err != nil {
+	// 	return fmt.Errorf("to apply migrations: %w", err)
+	// }
 
 	usercntrl.RegisterUserRoutes(api, db)
 	weathercntrl.RegisterWeatherRoutes(api, db)

@@ -41,13 +41,13 @@ func (cn *userController) RegisterHandler(c *fiber.Ctx) error {
 		Name:       req.Name,
 		Sex:        req.Sex,
 		Age:        req.Age,
-		City_n:     req.City_n,
-		City_w:     req.City_w,
-		Drop_time:	req.Drop_time,
-		T_comf:		req.t_comf,
-		T_tol:		req.t_tol,
-		T_puh:		req.t_puh,
-		Temp1:		req.temp1,
+		CityN:      req.CityN,
+		CityW:      req.CityW,
+		DropTime:   req.DropTime,
+		TComfort:   req.TComfort,
+		TTol:       req.TTol,
+		TPuh:       req.TPuh,
+		Temp1:      req.Temp1,
 		TelegramID: req.TelegramID,
 	})
 	if err != nil {
@@ -85,7 +85,7 @@ func (cn *userController) GetTelegramProfileHandler(c *fiber.Ctx) error {
 
 func (cn *userController) GetProfileHandler(c *fiber.Ctx) error {
 	var req GetProfileRequest
-	if err := c.BodyParser(&req); err != nil {
+	if err := c.ParamsParser(&req); err != nil {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := cn.validator.Struct(req); err != nil {
