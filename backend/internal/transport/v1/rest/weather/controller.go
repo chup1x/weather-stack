@@ -103,7 +103,7 @@ func (cn *weatherController) GetNewsHandler(c *fiber.Ctx) error {
 		//return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	city, err := cn.s.GetNews(c.UserContext(), req.CityN)
+	news, err := cn.s.GetNews(c.UserContext(), req.CityN)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
 			return c.SendStatus(fiber.StatusNotFound)
@@ -112,7 +112,7 @@ func (cn *weatherController) GetNewsHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	res := GetNewsResponse{city}
+	res := GetNewsResponse{news}
 
 	return c.JSON(res)
 }
