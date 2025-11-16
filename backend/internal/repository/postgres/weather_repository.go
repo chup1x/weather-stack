@@ -17,13 +17,13 @@ func NewWeatherRepository(db *gorm.DB) *WeatherRepository {
 }
 
 func (r *WeatherRepository) CreateWeatherRequest(ctx context.Context, new *domain.WeatherEntity) error {
-	return r.db.WithContext(ctx).Table("weather").Create(new).Error
+	return r.db.WithContext(ctx).Table("weather_requests").Create(new).Error
 }
 
 func (r *WeatherRepository) GetWeatherByCity(ctx context.Context, city string) (*domain.WeatherEntity, error) {
 	weather := &domain.WeatherEntity{}
 
-	if err := r.db.WithContext(ctx).Table("weather").Where("city_id = ?", city).First(weather).Error; err != nil {
+	if err := r.db.WithContext(ctx).Table("weather_requests").Where("city_id = ?", city).First(weather).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrUserNotFound
 		}

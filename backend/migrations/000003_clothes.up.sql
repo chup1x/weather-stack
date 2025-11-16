@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS clothes(
+	city_id     VARCHAR(30)  PRIMARY KEY,
+	path 		VARCHAR(100) NOT NULL,
+	
+	created_at  TIMESTAMP    NOT NULL DEFAULT now()
+);
