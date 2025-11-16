@@ -63,9 +63,11 @@ func (cn *userController) RegisterHandler(c *fiber.Ctx) error {
 func (cn *userController) GetTelegramProfileHandler(c *fiber.Ctx) error {
 	var req GetTelegramProfileRequest
 	if err := c.ParamsParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := cn.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 

@@ -14,7 +14,7 @@ type userCreater interface {
 
 type userProvider interface {
 	SelectByID(context.Context, domain.UserID) (*domain.UserEntity, error)
-	SelectByTelegramID(context.Context, int64) (*domain.UserEntity, error)
+	SelectByTelegramID(context.Context, int) (*domain.UserEntity, error)
 }
 
 type userStorage interface {
@@ -39,7 +39,7 @@ func (s *UserService) CreateUser(ctx context.Context, new *domain.UserEntity) (u
 	return new.ID, nil
 }
 
-func (s *UserService) GetProfileByTelegramID(ctx context.Context, id int64) (*domain.UserEntity, error) {
+func (s *UserService) GetProfileByTelegramID(ctx context.Context, id int) (*domain.UserEntity, error) {
 	user, err := s.users.SelectByTelegramID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("to select a user by telegram id: %w", err)

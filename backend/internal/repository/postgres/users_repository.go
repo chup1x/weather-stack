@@ -31,7 +31,7 @@ func (r *userRepository) SelectByID(ctx context.Context, id domain.UserID) (*dom
 	return user, nil
 }
 
-func (r *userRepository) SelectByTelegramID(ctx context.Context, id int64) (*domain.UserEntity, error) {
+func (r *userRepository) SelectByTelegramID(ctx context.Context, id int) (*domain.UserEntity, error) {
 	user := &domain.UserEntity{}
 	if err := r.db.WithContext(ctx).Table("users").Where("telegram_id = ?", id).First(user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
