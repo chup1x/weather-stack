@@ -112,7 +112,7 @@ func (cn *weatherController) GetNewsHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	res := GetNewsResponse{news}
+	res := news //GetNewsResponse{news}
 
-	return c.JSON(res)
+	return c.Data(200, "application/json", res)
 }

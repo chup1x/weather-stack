@@ -24,9 +24,9 @@ type GetNewsRequest struct {
 	CityN string `json:"city_n" validate:"required"`
 }
 
-type GetNewsResponse struct {
-	*domain.NewsEntity
-}
+// type GetNewsResponse struct {
+// 	[]byte
+// }
 
 type CreateWeatherRequest struct {
 	*domain.WeatherEntity

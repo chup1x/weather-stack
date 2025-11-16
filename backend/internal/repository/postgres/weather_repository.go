@@ -7,8 +7,9 @@ import (
     "net/url"
 	"log"
 	"io"
-	"fmt"
-	"os"
+	"encoding/json"
+	// "fmt"
+	// "os"
 
 	"github.com/chup1x/weather-stack/internal/domain"
 	"gorm.io/gorm"
@@ -49,10 +50,10 @@ func (r *WeatherRepository) GetClothesByComb(ctx context.Context, id int) ([]*do
 	return clothes, nil
 }
 */
-func (r *WeatherRepository) GetNewsByCity(ctx context.Context, city string) (*domain.NewsEntity, error) {
-	news := &domain.NewsEntity{}
+func (r *WeatherRepository) GetNewsByCity(ctx context.Context, city string) ([]byte, error) {
+	news_en := &domain.NewsEntity{}
 
-	if err := r.db.WithContext(ctx).Table("news").Where("city_id = ?", city).First(news).Error; err != nil {
+	if err := r.db.WithContext(ctx).Table("news").Where("city_id = ?", city).First(news_en).Error; err != nil {
 	
 
 		baseURL := "https://newsapi.org/v2/everything"
@@ -76,21 +77,22 @@ func (r *WeatherRepository) GetNewsByCity(ctx context.Context, city string) (*do
 			log.Fatal(err)
 		}
 
-		filename := fmt.Sprintf("temp_news_%s.json", city)
-		err = os.WriteFile(".json", body, 0644)
-		if err != nil {
-			log.Fatal("Error writing file:", err)
-		}
-		
-		news := &domain.NewsEntity{
-			PATH: filename,
-		}
-
-		// if err := r.db.WithContext(ctx).Table("news").Create(news).Error; err != nil {
-		// 	log.Fatal("Error writing file to database:", err)
-		return news, nil
+		// filename := fmt.Sprintf("temp_news_%s.json", city)
+		// err = os.WriteFile(".json", body, 0644)
+		// if err != nil {
+		// 	log.Fatal("Error writing file:", err)
 		// }
-	}
+		news, _ := json.Marshal(body)
+		// news_en := &domain.NewsEntity{
+		// 	PATH: filename,
+		// }
 
+		// if err := r.db.WithContext(ctx).Table("news").Create(news_en).Error; err != nil {
+		// 	log.Fatal("Error writing file to database:", err)
+		// 	return 
+		// }
+		return news, nil
+	}
+	news := []byte{'0'}
 	return news, nil
 }
