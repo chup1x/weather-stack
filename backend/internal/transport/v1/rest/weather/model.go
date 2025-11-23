@@ -5,7 +5,7 @@ import (
 )
 
 type GetWeatherHistoryRequest struct {
-	City_w string `param:"city_w" validate:"required"`
+	ID string `param:"id" validate:"required"`
 }
 
 type GetWeatherHistoryResponse struct {
@@ -20,18 +20,10 @@ type GetWeatherClothesResponse struct {
 	*domain.WeatherClothesEntity
 }
 
-type GetNewsRequest struct {
-	CityN string `json:"city_n" validate:"required"`
-}
-
-// type GetNewsResponse struct {
-// 	[]byte
-// }
-
 type CreateWeatherRequest struct {
 	*domain.WeatherEntity
 }
 
 type CreateWeatherResponse struct {
-	City	string	`json:"city"`
+	City string `json:"city"`
 }

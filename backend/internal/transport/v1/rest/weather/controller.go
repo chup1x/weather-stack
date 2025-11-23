@@ -1,13 +1,10 @@
 package weathercntrl
 
 import (
-	"errors"
-
 	"github.com/chup1x/weather-stack/internal/domain"
 	weatherservice "github.com/chup1x/weather-stack/internal/services"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 )
 
 type weatherController struct {
@@ -32,13 +29,13 @@ func (cn *weatherController) CreateWeatherRecordHandler(c *fiber.Ctx) error {
 	}
 
 	if err := cn.s.CreateWeatherRecord(c.UserContext(), &domain.WeatherEntity{
-		CityID: req.CityID,
+		CityID:      req.CityID,
 		Temperature: req.Temperature,
-		FeelsLike: req.FeelsLike,
+		FeelsLike:   req.FeelsLike,
 		Description: req.Description,
-		Humidity: req.Humidity,
-		Pressure: req.Pressure,
-		WindSpeed: req.WindSpeed,
+		Humidity:    req.Humidity,
+		Pressure:    req.Pressure,
+		WindSpeed:   req.WindSpeed,
 	}); err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
@@ -47,7 +44,6 @@ func (cn *weatherController) CreateWeatherRecordHandler(c *fiber.Ctx) error {
 }
 
 func (cn *weatherController) GetWeatherHandler(c *fiber.Ctx) error {
-	
 	var req GetWeatherHistoryRequest
 	if err := c.ParamsParser(&req); err != nil {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
@@ -56,12 +52,8 @@ func (cn *weatherController) GetWeatherHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	city, err := cn.s.GetWeather(c.UserContext(), req.City_w)
+	city, err := cn.s.GetWeather(c.UserContext(), req.ID)
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			return c.SendStatus(fiber.StatusNotFound)
-		}
-		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -69,50 +61,28 @@ func (cn *weatherController) GetWeatherHandler(c *fiber.Ctx) error {
 
 	return c.JSON(res)
 }
+
 /*
-func (cn *weatherController) GetWeatherClothesHandler(c *fiber.Ctx) error {
-	var req GetWeatherClothesRequest
-	if err := c.BodyParser(&req); err != nil {
-		return c.SendStatus(fiber.StatusUnprocessableEntity)
-	}
-	if err := cn.validator.Struct(req); err != nil {
-		return c.SendStatus(fiber.StatusUnprocessableEntity)
-	}
-
-	clothes, err := cn.s.GetWeatherClothes(c.UserContext(), req.user)
-	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			return c.SendStatus(fiber.StatusNotFound)
+	func (cn *weatherController) GetWeatherClothesHandler(c *fiber.Ctx) error {
+		var req GetWeatherClothesRequest
+		if err := c.BodyParser(&req); err != nil {
+			return c.SendStatus(fiber.StatusUnprocessableEntity)
 		}
-		log.Error(err.Error())
-		return c.SendStatus(fiber.StatusInternalServerError)
+		if err := cn.validator.Struct(req); err != nil {
+			return c.SendStatus(fiber.StatusUnprocessableEntity)
+		}
+
+		clothes, err := cn.s.GetWeatherClothes(c.UserContext(), req.user)
+		if err != nil {
+			if errors.Is(err, domain.ErrUserNotFound) {
+				return c.SendStatus(fiber.StatusNotFound)
+			}
+			log.Error(err.Error())
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		res := GetWeatherClothesResponse{clothes}
+
+		return c.JSON(res)
 	}
-
-	res := GetWeatherClothesResponse{clothes}
-
-	return c.JSON(res)
-}
 */
-func (cn *weatherController) GetNewsHandler(c *fiber.Ctx) error {
-	var req GetNewsRequest
-	log.Error(req)
-	if err := c.ParamsParser(&req); err != nil {
-		//return c.SendStatus(fiber.StatusUnprocessableEntity)
-	}
-	if err := cn.validator.Struct(req); err != nil {
-		//return c.SendStatus(fiber.StatusUnprocessableEntity)
-	}
-
-	news, err := cn.s.GetNews(c.UserContext(), req.CityN)
-	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			return c.SendStatus(fiber.StatusNotFound)
-		}
-		log.Error(err.Error())
-		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	res := news //GetNewsResponse{news}
-
-	return c.Data(200, "application/json", res)
-}

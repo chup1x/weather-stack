@@ -27,6 +27,6 @@ type UserEntity struct {
 	Temp1      int       `json:"temp1" gorm:"temp1"`
 	Temp2      string    `json:"-" gorm:"temp2"`
 	Password   string    `json:"password" gorm:"password"`
-	TelegramID int		 `json:"telegram_id" gorm:"telegram_id"`
+	TelegramID int       `json:"telegram_id" gorm:"telegram_id"`
 	CreatedAt  time.Time `json:"created_at" gorm:"created_at"`
 }
