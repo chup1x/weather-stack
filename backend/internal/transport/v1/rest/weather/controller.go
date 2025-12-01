@@ -2,7 +2,7 @@ package weathercntrl
 
 import (
 	"github.com/chup1x/weather-stack/internal/domain"
-	weatherservice "github.com/chup1x/weather-stack/internal/services"
+	weatherservice "github.com/chup1x/weather-stack/internal/services/weather"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )

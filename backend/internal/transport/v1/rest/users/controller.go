@@ -4,19 +4,18 @@ import (
 	"errors"
 
 	"github.com/chup1x/weather-stack/internal/domain"
-	"github.com/chup1x/weather-stack/internal/services"
-	weatherservice "github.com/chup1x/weather-stack/internal/services"
+	userserv "github.com/chup1x/weather-stack/internal/services/users"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 )
 
 type userController struct {
-	s         *services.UserService
+	s         *userserv.UserService
 	validator *validator.Validate
 }
 
-func NewUserController(service *weatherservice.UserService) *userController {
+func NewUserController(service *userserv.UserService) *userController {
 	return &userController{
 		validator: validator.New(),
 		s:         service,

@@ -29,11 +29,6 @@ func (r *newsRepository) GetNewsByCityID(ctx context.Context, cityID string) (*d
 		}
 		return nil, err
 	}
-		// if err := r.db.WithContext(ctx).Table("news").Create(news_en).Error; err != nil {
-		// 	log.Fatal("Error writing file to database:", err)
-		// 	return
-		// }
-		// return news, nil
 
 	return news, nil
 }

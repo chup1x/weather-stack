@@ -2,7 +2,7 @@ package weathercntrl
 
 import (
 	"github.com/chup1x/weather-stack/internal/repository/postgres"
-	weatherservice "github.com/chup1x/weather-stack/internal/services"
+	weatherservice "github.com/chup1x/weather-stack/internal/services/weather"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )

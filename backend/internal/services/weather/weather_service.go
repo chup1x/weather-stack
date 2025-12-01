@@ -3,9 +3,6 @@ package services
 import (
 	"context"
 	"fmt"
-	"log"
-	"net/http"
-	"net/url"
 
 	"github.com/chup1x/weather-stack/internal/domain"
 )
@@ -16,7 +13,6 @@ type weatherCreater interface {
 
 type weatherProvider interface {
 	GetWeatherByCity(context.Context, string) (*domain.WeatherEntity, error)
-	//GetClothesByComb(context.Context, int) (*domain.WeatherClothesEntity, error)
 }
 
 type weatherStorage interface {
@@ -48,14 +44,3 @@ func (s *WeatherService) GetWeather(ctx context.Context, city string) (*domain.W
 	}
 	return weather, nil
 }
-
-/*
-	func (s *WeatherService) GetWeatherClothes(ctx context.Context, id int64) (*domain.WeatherClothesEntity, error) {
-		//comb, err := s.repo.SelectByTelegramID(ctx, id)
-		clothes, err := s.repo.GetClothesByComb(ctx, 1234)
-		if err != nil {
-			return nil, fmt.Errorf("to select a weather by city: %w", err)
-		}
-		return clothes, nil
-	}
-*/

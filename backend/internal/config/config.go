@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Server   serverConfig
 	Postgres postgresConfig
+	News     newsServiceConfig
 }
 
 type serverConfig struct {
@@ -23,6 +24,11 @@ type postgresConfig struct {
 	User     string `env:"POSTGRES_USER" envDefault:"postgres"`
 	Password string `env:"POSTGRES_PASSWORD" envDefault:"postgres"`
 	SSLMode  string `env:"POSTGRES_SSLMODE" envDefault:"disable"`
+}
+
+type newsServiceConfig struct {
+	Host   string `env:"NEW_SERVICE_HOST" envDefault:"newsapi.org/v2/everything"`
+	APIKey string `env:"NEW_SERVICE_API_KEY" envDefault:"0fac40f7dcd34967af176019e1c6a526"`
 }
 
 func GetConfig() (*Config, error) {

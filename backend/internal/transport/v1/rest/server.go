@@ -45,7 +45,7 @@ func (s *Server) Start(_ context.Context, cfg *config.Config) error {
 
 	usercntrl.RegisterUserRoutes(api, db)
 	weathercntrl.RegisterWeatherRoutes(api, db)
-	newscntrl.RegisterNewsRoutes(api, db)
+	newscntrl.RegisterNewsRoutes(api, cfg, db)
 
 	if err := s.app.Listen(fmt.Sprintf("0.0.0.0:%s", cfg.Server.Port)); err != nil {
 		return fmt.Errorf("server start: unable to start web server")

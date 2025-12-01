@@ -2,7 +2,7 @@ package usercntrl
 
 import (
 	"github.com/chup1x/weather-stack/internal/repository/postgres"
-	"github.com/chup1x/weather-stack/internal/services"
+	services "github.com/chup1x/weather-stack/internal/services/users"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )

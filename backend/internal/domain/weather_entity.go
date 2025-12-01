@@ -16,5 +16,5 @@ type WeatherEntity struct {
 }
 
 type WeatherClothesEntity struct {
-	PATH string `json:"path" gorm:"path"`
+	Path string `json:"path" gorm:"path"`
 }
