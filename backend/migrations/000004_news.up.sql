@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS news(
-	city_id     VARCHAR(30)  PRIMARY KEY,
+	city_id     VARCHAR(100)  PRIMARY KEY,
 	path 		VARCHAR(100) NOT NULL DEFAULT '',
 	
 	created_at  TIMESTAMP    NOT NULL DEFAULT now()

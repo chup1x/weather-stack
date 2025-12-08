@@ -8,23 +8,23 @@ def post_register_user(usr_id: str, data):
     
     address = "profile/register"
     payload = {
-        "name": str(data[0]),
+        "name": "Иван", #data[0],
         "sex": "male",
         "age": 69,
-        "city_n": str(data[1]),
-        "city_w": str(data[5]),
-        "drop_time": str(data[6]),
-        "t_comfort": int(data[2]),
-        "t_tol": int(data[3]),
-        "t_puh": int(data[4]),
-        #"temp1": float(str(data[2]) + str(data[3]) + str(data[4])),
-        "telegram_id": int(usr_id)
+        "city_n": "Moscow",#data[1],
+        "city_w": "Moscow",#data[5],
+        "drop_time": "08:30",#data[6],
+        "t_comfort": 20,#data[2],
+        "t_tol": 15,#data[3],
+        "t_puh": 5,#data[4],
+        "temp": 0, #"temp1": float(str(data[2]) + str(data[3]) + str(data[4])),
+        "telegram_id": 123456789#int(usr_id),
     }
 
     try:
         logger.debug(f"отправка POST запроса на {url + address}")
         response = requests.post(url + address, json=payload, timeout=10)
-        logger.info(f"ответ сервера при регистрации: {response.status_code}")
+        logger.info(f"ответ сервера при регистрации: {response.status_code},{response.text}")
         return response
     except Exception as e:
         logger.error(f"ошибка отправки данных регистрации: {e}")
@@ -69,7 +69,7 @@ def get_weather_with_profile(user_id: str):
                 user_data = response.json()
                 logger.debug("данные погоды через профиль получены")
             except Exception as e:
-                logger.error(f"ошибка парсинга (погода/профиль): {e},{response.text}")
+                logger.error(f"ошибка парсинга (погода/профиль): {e}")
         else:
             logger.warning(f"неуспешный статус при запросе погоды через профиль: {response.status_code}")
 
@@ -106,7 +106,7 @@ def get_clothes_with_profile(user_id: str):
 def get_weather(city: str):
     
     address = f"weather/city/{city}"
-    #address = "weather/city/Санкт-Петербург"
+
     try:
         response = requests.get(url + address, timeout=10)
         logger.info(f"ответ сервера при запросе погоды по городу: {response.status_code}")
@@ -117,7 +117,7 @@ def get_weather(city: str):
                 user_data = response.json()
                 logger.debug("данные погоды по городу получены")
             except Exception as e:
-                logger.error(f"ошибка парсинга (погода): {e},{response.text}")
+                logger.error(f"ошибка парсинга (погода): {e}")
         else:
             logger.warning(f"неуспешный статус при запросе погоды по городу: {response.status_code}")
 

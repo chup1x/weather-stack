@@ -4,9 +4,12 @@ import (
 	"context"
 	"errors"
 	"time"
+	"fmt"
 
 	"github.com/chup1x/weather-stack/internal/domain"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+
 )
 
 type newsRepository struct {
@@ -18,7 +21,15 @@ func NewNewsRepository(db *gorm.DB) *newsRepository {
 }
 
 func (r *newsRepository) CreateNewsRequest(ctx context.Context, new *domain.NewsEntity) error {
-	return r.db.WithContext(ctx).Table("news").Create(new).Error
+	fmt.Print(new.CityID)
+	return r.db.WithContext(ctx).
+		Table("news").
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "city_id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"path", "created_at"}),
+		}).
+		Create(new).
+		Error
 }
 
 func (r *newsRepository) GetNewsByCityID(ctx context.Context, cityID string) (*domain.NewsEntity, error) {
