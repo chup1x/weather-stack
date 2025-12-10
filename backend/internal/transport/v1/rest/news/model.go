@@ -5,7 +5,7 @@ import (
 )
 
 type GetNewsRequest struct {
-	CityID string `params:"city_id" validate:"required"`
+	City string `params:"city" validate:"required"`
 }
 
 type GetNewsByTelegramRequest struct {

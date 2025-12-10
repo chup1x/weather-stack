@@ -24,40 +24,18 @@ import construct as cnst
     CANCEL,
 ) = range(11)
 
-
 async def start(update, context):
     user = update.effective_user
     logger.info(f"Команда /start от {user.username or user.first_name} (ID: {user.id})")
 
-    welcome_msg = (
-        f"Приветствую, {user.first_name}!\n\n"
-        "Доступные команды:\n"
-        "/register - регистрация\n"
-        "/weather - прогноз погоды\n"
-        "/news - последние новости\n"
-        "/profile - ваш профиль\n"
-        "/clothes - рекомендации по одежде\n"
-        "/settemperatures - настройка комфортных температур\n"
-        "/help - помощь\n"
-    )
-    await update.message.reply_text(welcome_msg)
+    welcome_msg = f"Приветствую, {user.first_name}!\n\n" + cnst.welcome_msg
 
+    await update.message.reply_text(welcome_msg)
 
 async def help_command(update, context):
     user_id = update.effective_user.id
     logger.info(f"Команда /help от {user_id}")
-
-    help_text = (
-        "Доступные команды:\n"
-        "/start - регистрация и начало работы\n"
-        "/weather - прогноз погоды для вашего города\n"
-        "/news - последние новости по интересующему городу\n"
-        "/profile - информация о вашем профиле\n"
-        "/clothes - рекомендации по одежде для вашего города\n"
-        "/settemperatures - настройка комфортных температур\n"
-    )
-    await update.message.reply_text(help_text)
-
+    await update.message.reply_text(cnst.welcome_msg)
 
 async def profile_command(update, context):
     user = update.effective_user
@@ -72,8 +50,6 @@ async def profile_command(update, context):
         data = {
             "id": profile.get("id"),
             "name": profile.get("name"),
-            "sex": profile.get("sex"),
-            "age": profile.get("age"),
             "city_n": profile.get("city_n"),
             "city_w": profile.get("city_w") or profile.get("city"),
             "t_comfort": profile.get("t_comfort"),
@@ -84,8 +60,6 @@ async def profile_command(update, context):
         data = {
             "id": profile[0] if len(profile) > 0 else None,
             "name": profile[1] if len(profile) > 1 else None,
-            "sex": profile[2] if len(profile) > 2 else None,
-            "age": profile[3] if len(profile) > 3 else None,
             "city_n": profile[5] if len(profile) > 5 else None,
             "city_w": profile[6] if len(profile) > 6 else None,
             "t_comfort": profile[7] if len(profile) > 7 else None,
@@ -102,8 +76,6 @@ async def profile_command(update, context):
         "Ваш профиль:\n"
         f"• ID: {fmt(data.get('id'))}\n"
         f"• Имя: {fmt(data.get('name'))}\n"
-        f"• Пол: {fmt(data.get('sex'))}\n"
-        f"• Возраст: {fmt(data.get('age'))}\n"
         f"• Город для новостей: {fmt(data.get('city_n'))}\n"
         f"• Город для погоды: {fmt(data.get('city_w'))}\n"
         f"• Комфорт в футболке: {fmt(data.get('t_comfort'))}°C\n"
@@ -216,7 +188,6 @@ async def process_input(update, context):
             return WAITING_JACKET
 
         if context.user_data.get("registration") != user_id:
-            await cnst.send_weather_success(update.message, context.user_data[user_id])
             return ConversationHandler.END
 
         await update.message.reply_text("Использовать этот же город для новостей? (да/нет)")
@@ -244,22 +215,22 @@ async def set_city_news(update, context):
     user = update.effective_user
     user_id = user.id
     message_text = update.message.text.strip()
-
-    fl = yes_no(message_text)
+    
     current_index = context.user_data[user_id][0]
+    fl = yes_no(message_text)
 
-    if current_index + 1 == 4 and fl:
+    if current_index == 4 and fl:
         context.user_data[user_id][5] = context.user_data[user_id][1]
-        await update.message.reply_text("Сохранено! Когда присылать новости/погоду? (формат 10/00)")
+        await update.message.reply_text("Сохранено! Когда присылать новости/погоду? (формат 10:00)")
         context.user_data[user_id][0] = current_index + 1
         return DROP_TIME
-    elif not fl and current_index == 3:
+    elif not fl and current_index == 4:
         await update.message.reply_text("Введите город для новостей:")
         context.user_data[user_id][0] = current_index + 1
         return WAITING_CITY2
-    elif current_index + 1 == 5:
+    elif current_index == 5:
         context.user_data[user_id][5] = message_text
-        await update.message.reply_text("Сохранено! Когда присылать новости/погоду? (формат 10/00)")
+        await update.message.reply_text("Сохранено! Когда присылать новости/погоду? (формат 10:00)")
         context.user_data[user_id][0] = current_index + 1
         return DROP_TIME
 
@@ -289,33 +260,39 @@ async def weather_command(update, context):
     logger.info(f"Запрос погоды от {user_id}")
 
     if cnst.user_exists(user_id):
-        profile = cnst.get_user_profile(user_id)
-        city = None
-        if isinstance(profile, dict):
-            city = profile.get("city_w") or profile.get("city")
-        elif isinstance(profile, (list, tuple)) and len(profile) > 6:
-            city = profile[6]
-        try:
-            status, data = req.get_weather(city)
-            if status == 200 and isinstance(data, dict):
-                text = (
-                    f"Погода в {city}:\n"
-                    f"Температура: {data.get('temperature')}°C (ощущается {data.get('feels')}°C)\n"
-                    f"Описание: {data.get('description')}\n"
-                    f"Влажность: {data.get('humidity')}%\n"
-                    f"Давление: {data.get('pressure')} hPa\n"
-                    f"Ветер: {data.get('wind_speed')} м/с"
-                )
-                await update.message.reply_text(text)
-            else:
-                raise AssertionError(f"HTTP {status}")
-        except AssertionError:
-            await update.message.reply_text("Не удалось получить погоду. Попробуйте позже.")
+        
+        status, data = req.get_weather_with_profile(user_id)
+        response = await weather_decode(status, data)
+        await update.message.reply_text(response)
         return ConversationHandler.END
-
-    await update.message.reply_text("Нужно завершить регистрацию, чтобы получить погоду: /register")
+    else:
+        await update.message.reply_text("Введите название города")
+        return WAITING_CITY_WEATHER
     return ConversationHandler.END
 
+async def weather_by_city(update, context):
+    city = update.message.text.strip()
+    status, data = req.get_weather(city)
+    response = await weather_decode(status, data)
+    await update.message.reply_text(response)
+    return ConversationHandler.END
+
+async def weather_decode(status, data):
+    try:
+        if status == 200 and isinstance(data, dict):
+            text = (
+                #f"Погода в городе {city}:\n"
+                f"Температура: {data.get('temperature')}°C (ощущается {data.get('feels')}°C)\n"
+                f"Описание: {data.get('description')}\n"
+                f"Влажность: {data.get('humidity')}%\n"
+                f"Давление: {data.get('pressure')} hPa\n"
+                f"Ветер: {data.get('wind_speed')} м/с"
+            )
+            return text
+        else:
+            raise AssertionError(f"HTTP {status}")
+    except AssertionError:
+        return "Не удалось получить погоду. Попробуйте позже."
 
 async def news_command(update, context):
     user = update.effective_user
@@ -323,49 +300,40 @@ async def news_command(update, context):
     logger.info(f"Запрос новостей от {user_id}")
 
     if cnst.user_exists(user_id):
-        profile = cnst.get_user_profile(user_id)
-        city = None
-        if isinstance(profile, dict):
-            city = profile.get("city_n") or profile.get("city")
-        elif isinstance(profile, (list, tuple)) and len(profile) > 5:
-            city = profile[5]
-        try:
-            status, data = req.get_news(city)
-            if status == 200 and isinstance(data, dict):
-                articles = data.get("articles") or []
-                if not articles:
-                    await update.message.reply_text(
-                        f"Новостей по городу {city} не найдено за последнее время."
-                    )
-                else:
-                    lines = [f"Свежие новости по {city}:"]
-                    for i, art in enumerate(articles[:5], 1):
-                        title = art.get("title") or "Без заголовка"
-                        source = (art.get("source") or {}).get("name") or "Не указан"
-                        url = art.get("url") or ""
-                        lines.append(f"{i}. {title}\n   Источник: {source}\n   Ссылка: {url}")
-                    await update.message.reply_text("\n".join(lines))
-            else:
-                raise AssertionError(f"HTTP {status}")
-        except AssertionError:
-            await update.message.reply_text("Не удалось получить новости. Попробуйте позже.")
+        status, data = req.get_news_by_profile(user_id)
+        response = await news_decode(status, data)
+        await update.message.reply_text(response)
         return ConversationHandler.END
-
-    await update.message.reply_text("Нужно завершить регистрацию, чтобы получить новости: /register")
+    else:
+        await update.message.reply_text("Введите название города")
+        return WAITING_CITY_NEWS
     return ConversationHandler.END
 
+async def news_by_city(update, context):
+    city = update.message.text.strip()
+    status, data = req.get_news(city)
+    response = await news_decode(status, data)
+    await update.message.reply_text(response)
+    return ConversationHandler.END
 
-async def send_weather_success(message, temp_data):
-    user_id = message.from_user.id
-    logger.info(f"Отправка подтверждения температурных настроек {user_id}")
-    success_msg = (
-        "Настройки комфортных температур сохранены!\n\n"
-        f"Футболка: {temp_data[2]}°C\n"
-        f"Толстовка: {temp_data[3]}°C\n"
-        f"Пуховик: {temp_data[4]}°C\n"
-    )
-    await message.reply_text(success_msg)
-
+async def news_decode(status, data):
+    try:  
+        if status == 200 and isinstance(data, dict):
+            articles = data.get("articles") or []
+            if not articles:
+                return f"Новостей по городу не найдено за последнее время."
+            else:
+                lines = [f"Свежие новости:"]
+                for i, art in enumerate(articles[:5], 1):
+                    title = art.get("title") or "Без заголовка"
+                    source = (art.get("source") or {}).get("name") or "Не указан"
+                    url = art.get("url") or ""
+                    lines.append(f"{i}. {title}\n   Источник: {source}\n   Ссылка: {url}")
+                return "\n".join(lines)
+        else:
+            raise AssertionError(f"HTTP {status}")
+    except AssertionError:
+        return "Не удалось получить новости. Попробуйте позже."
 
 async def cancel(update, context):
     user = update.effective_user
@@ -387,6 +355,7 @@ reg_states = {
     CANCEL: [MessageHandler(filters.TEXT & ~filters.COMMAND, cancel)],
 }
 
+# old
 clothes_states = {
     WAITING_TSHIRT: [MessageHandler(filters.TEXT & ~filters.COMMAND, process_input)],
     WAITING_HOODIE: [MessageHandler(filters.TEXT & ~filters.COMMAND, process_input)],
@@ -394,11 +363,11 @@ clothes_states = {
 }
 
 weather_state = {
-    WAITING_CITY_WEATHER: [MessageHandler(filters.TEXT & ~filters.COMMAND, waiting_city_w)],
+    WAITING_CITY_WEATHER: [MessageHandler(filters.TEXT & ~filters.COMMAND, weather_by_city)],
 }
 
 news_state = {
-    WAITING_CITY_NEWS: [MessageHandler(filters.TEXT & ~filters.COMMAND, set_city_news)],
+    WAITING_CITY_NEWS: [MessageHandler(filters.TEXT & ~filters.COMMAND, news_by_city)],
 }
 
 conv_handler_weather = ConversationHandler(

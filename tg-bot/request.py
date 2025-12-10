@@ -55,6 +55,30 @@ def get_user_profile(usr_id: str):
         logger.error(f"ошибка при запросе профиля пользователя: {e}")
         return None, None
 
+def get_weather(city: str):
+    
+    address = f"weather/city"
+
+    try:
+        response = requests.get(url + address, data={'city':city}, timeout=10)
+        logger.info(f"ответ сервера при запросе погоды по городу: {response.status_code}")
+        
+        user_data = None
+        if response.status_code == 200:
+            try:
+                user_data = response.json()
+                logger.debug("данные погоды по городу получены")
+            except Exception as e:
+                logger.error(f"ошибка парсинга (погода): {e},{response.text}")
+        else:
+            logger.warning(f"неуспешный статус при запросе погоды по городу: {response.status_code}")
+
+        return response.status_code, user_data
+        
+    except Exception as e:
+        logger.error(f"ошибка при запросе погоды по городу: {e}")
+        return None, None
+
 def get_weather_with_profile(user_id: str):
     
     address = f"weather/by-telegram-id/{user_id}"
@@ -77,54 +101,6 @@ def get_weather_with_profile(user_id: str):
         
     except Exception as e:
         logger.error(f"ошибка при запросе погоды через профиль: {e}")
-        return None, None
-
-def get_clothes_with_profile(user_id: str):
-    
-    address = f"weather/clothes/{user_id}"
-
-    try:
-        response = requests.get(url + address, timeout=10)
-        logger.info(f"ответ сервера при запросе одежды через профиль: {response.status_code}")
-        
-        user_data = None
-        if response.status_code == 200:
-            try:
-                user_data = response.json()
-                logger.debug("данные одежды через профиль получены")
-            except Exception as e:
-                logger.error(f"Ошибка парсинга (одежда/профиль): {e}")
-        else:
-            logger.warning(f"неуспешный статус при запросе одежды через профиль: {response.status_code}")
-
-        return response.status_code, user_data
-        
-    except Exception as e:
-        logger.error(f"ошибка при запросе одежды через профиль: {e}")
-        return None, None
-
-def get_weather(city: str):
-    
-    address = f"weather/city/{city}"
-    #address = "weather/city/Санкт-Петербург"
-    try:
-        response = requests.get(url + address, timeout=10)
-        logger.info(f"ответ сервера при запросе погоды по городу: {response.status_code}")
-        
-        user_data = None
-        if response.status_code == 200:
-            try:
-                user_data = response.json()
-                logger.debug("данные погоды по городу получены")
-            except Exception as e:
-                logger.error(f"ошибка парсинга (погода): {e},{response.text}")
-        else:
-            logger.warning(f"неуспешный статус при запросе погоды по городу: {response.status_code}")
-
-        return response.status_code, user_data
-        
-    except Exception as e:
-        logger.error(f"ошибка при запросе погоды по городу: {e}")
         return None, None
 
 def get_clothes(city: str):
@@ -151,13 +127,62 @@ def get_clothes(city: str):
         logger.error(f"ошибка при запросе одежды по городу: {e}")
         return None, None
 
-def get_news(city: str):
+def get_clothes_with_profile(user_id: str):
     
-    address = f"news/city/{city}"
+    address = f"weather/clothes/{user_id}"
 
     try:
         response = requests.get(url + address, timeout=10)
+        logger.info(f"ответ сервера при запросе одежды через профиль: {response.status_code}")
+        
+        user_data = None
+        if response.status_code == 200:
+            try:
+                user_data = response.json()
+                logger.debug("данные одежды через профиль получены")
+            except Exception as e:
+                logger.error(f"Ошибка парсинга (одежда/профиль): {e}")
+        else:
+            logger.warning(f"неуспешный статус при запросе одежды через профиль: {response.status_code}")
+
+        return response.status_code, user_data
+        
+    except Exception as e:
+        logger.error(f"ошибка при запросе одежды через профиль: {e}")
+        return None, None
+
+
+def get_news(city: str):
+    
+    address = f"news/city"
+
+    try:
+        response = requests.get(url + address, data={'city':city}, timeout=10)
         logger.info(f"ответ сервера при запросе новостей: {response.status_code}")
+        
+        user_data = None
+        if response.status_code == 200:
+            try:
+                user_data = response.json()
+                logger.debug("данные новостей получены")
+            except Exception as e:
+                logger.error(f"ошибка парсинга (новости): {e}")
+        else:
+            logger.warning(f"неуспешный статус при запросе новостей: {response.status_code}")
+
+        return response.status_code, user_data
+        
+    except Exception as e:
+        logger.error(f"ошибка при запросе новостей: {e}")
+        return None, None
+
+def get_news_by_profile(user_id: str):
+    
+    address = f"news/by-telegram-id/{user_id}"
+
+    try:
+        response = requests.get(url + address, timeout=10)
+        logger.info(f"ответ сервера при запросе новостей по профилю: {response.status_code}")
         
         user_data = None
         if response.status_code == 200:

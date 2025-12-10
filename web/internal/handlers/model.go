@@ -45,7 +45,7 @@ type GetUserResponse struct {
 }
 
 type GetCityRequest struct {
-	City string `params:"city" validate:"required"`
+	City string `json:"city" validate:"required"`
 }
 
 type GetTelegramRequest struct {

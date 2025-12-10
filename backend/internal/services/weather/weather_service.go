@@ -64,7 +64,7 @@ func (s *WeatherService) GetWeatherWithCache(ctx context.Context, city string) (
 	}
 
 	if err := s.repo.CreateWeatherRequest(ctx, fetched); err != nil {
-		return nil, fmt.Errorf("save fetched weather: %w", err)
+		return nil, fmt.Errorf("save fetched %s weather: %w", city, err)
 	}
 
 	return fetched, nil
