@@ -5,7 +5,7 @@ import (
 )
 
 type GetWeatherHistoryRequest struct {
-	ID string `param:"id" validate:"required"`
+	City string `json:"city" validate:"required"`
 }
 
 type GetWeatherByTelegramRequest struct {

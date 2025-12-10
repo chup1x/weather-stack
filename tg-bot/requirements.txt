@@ -1,3 +1,4 @@
 python-telegram-bot==20.7
 loguru==0.7.2
-requests==2.31.0
+requests-async==0.2.4
+python-dotenv

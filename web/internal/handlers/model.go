@@ -16,7 +16,7 @@ type RegisterUserRequest struct {
 	TComfort   int    `json:"t_comfort" validate:"required"`
 	TTol       int    `json:"t_tol" validate:"required"`
 	TPuh       int    `json:"t_puh" validate:"required"`
-	Temp1      int    `json:"temp1" validate:"required"`
+	Temp1      int    `json:"-,omitempty"`
 	TelegramID int64  `json:"telegram_id" validate:"required"`
 }
 
@@ -39,13 +39,13 @@ type GetUserResponse struct {
 	TComfort   int       `json:"t_comfort" validate:"required"`
 	TTol       int       `json:"t_tol" validate:"required"`
 	TPuh       int       `json:"t_puh" validate:"required"`
-	Temp1      int       `json:"temp1" validate:"required"`
+	//Temp1      int       `json:"-" validate:"required"`
 	TelegramID int64     `json:"telegram_id" validate:"required"`
 	CreatedAt  time.Time `json:"created_at" gorm:"created_at"`
 }
 
 type GetCityRequest struct {
-	City string `params:"city" validate:"required"`
+	City string `json:"city" validate:"required"`
 }
 
 type GetTelegramRequest struct {

@@ -1,17 +1,19 @@
 from logger_config import logger
 from telegram.ext import Application
 from handlers import get_handlers
-from config import config
+from dotenv import load_dotenv
+import os
 
 def main() -> None:
     logger.info("Запуск")
-    
+    load_dotenv()
     try:
-        if not config.TELEGRAM_TOKEN:
+        TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+        if not TELEGRAM_TOKEN:
             logger.error("TELEGRAM_TOKEN не найден")
             raise ValueError("TELEGRAM_TOKEN не найден")
         
-        application = Application.builder().token(config.TELEGRAM_TOKEN).build()
+        application = Application.builder().token(TELEGRAM_TOKEN).build()
 
         handlers = get_handlers()
         for handler in handlers:

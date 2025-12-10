@@ -29,10 +29,12 @@ func (cn *userController) LoginHandler(c *fiber.Ctx) error {
 func (cn *userController) RegisterHandler(c *fiber.Ctx) error {
 	var req RegisterProfileRequest
 	if err := c.BodyParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
 	if err := cn.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
@@ -46,7 +48,7 @@ func (cn *userController) RegisterHandler(c *fiber.Ctx) error {
 		TComfort:   req.TComfort,
 		TTol:       req.TTol,
 		TPuh:       req.TPuh,
-		Temp1:      req.Temp1,
+		Temp1:       req.Temp1,
 		TelegramID: req.TelegramID,
 	})
 	if err != nil {
@@ -62,15 +64,18 @@ func (cn *userController) RegisterHandler(c *fiber.Ctx) error {
 func (cn *userController) GetTelegramProfileHandler(c *fiber.Ctx) error {
 	var req GetTelegramProfileRequest
 	if err := c.ParamsParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := cn.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
 	user, err := cn.s.GetProfileByTelegramID(c.UserContext(), req.ID)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
+			log.Error(err.Error())
 			return c.SendStatus(fiber.StatusNotFound)
 		}
 		log.Error(err.Error())
@@ -85,15 +90,18 @@ func (cn *userController) GetTelegramProfileHandler(c *fiber.Ctx) error {
 func (cn *userController) GetProfileHandler(c *fiber.Ctx) error {
 	var req GetProfileRequest
 	if err := c.ParamsParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := cn.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
 	user, err := cn.s.GetProfileByID(c.UserContext(), req.ID)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
+			log.Error(err.Error())
 			return c.SendStatus(fiber.StatusNotFound)
 		}
 		log.Error(err.Error())

@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 type Provider struct {
@@ -24,7 +25,7 @@ func New(host string) *Provider {
 		Host:      host,
 		validator: validator.New(),
 		Client: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: 60 * time.Second,
 		},
 	}
 }
@@ -33,17 +34,17 @@ func (p *Provider) RegisterUserHandler(c *fiber.Ctx) error {
 	var req RegisterUserRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		fmt.Errorf("bla", err)
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := p.validator.Struct(req); err != nil {
-		fmt.Errorf("blab", err)
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
 	rawBody, err := json.Marshal(req)
 	if err != nil {
-		fmt.Errorf("blabl", err)
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -54,12 +55,13 @@ func (p *Provider) RegisterUserHandler(c *fiber.Ctx) error {
 		bytes.NewReader(rawBody),
 	)
 	if err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(statusCode)
 	}
 
 	res := RegisterUserResponse{}
 	if err := json.Unmarshal(body, &res); err != nil {
-		fmt.Errorf("blabla", err)
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 	return c.JSON(res)
@@ -68,9 +70,11 @@ func (p *Provider) RegisterUserHandler(c *fiber.Ctx) error {
 func (p *Provider) GetUserHandler(c *fiber.Ctx) error {
 	var req GetUserRequest
 	if err := c.ParamsParser(&req); err != nil {
+		
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := p.validator.Struct(req); err != nil {
+		
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
@@ -81,14 +85,17 @@ func (p *Provider) GetUserHandler(c *fiber.Ctx) error {
 		nil,
 	)
 	if err != nil {
+		
 		return c.SendStatus(statusCode)
 	}
 	if statusCode != http.StatusOK {
+		
 		return c.SendStatus(statusCode)
 	}
 
 	res := GetUserResponse{}
 	if err := json.Unmarshal(body, &res); err != nil {
+		
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -98,9 +105,11 @@ func (p *Provider) GetUserHandler(c *fiber.Ctx) error {
 func (p *Provider) GetUserByTelegramHandler(c *fiber.Ctx) error {
 	var req GetTelegramRequest
 	if err := c.ParamsParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := p.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
@@ -111,14 +120,17 @@ func (p *Provider) GetUserByTelegramHandler(c *fiber.Ctx) error {
 		nil,
 	)
 	if err != nil {
+		//log.Error(err.Error())
 		return c.SendStatus(statusCode)
 	}
 	if statusCode != http.StatusOK {
+		//log.Error(err.Error())
 		return c.SendStatus(statusCode)
 	}
 
 	res := GetUserResponse{}
 	if err := json.Unmarshal(body, &res); err != nil {
+		//log.Error(err.Error())
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 	return c.JSON(res)
@@ -126,20 +138,29 @@ func (p *Provider) GetUserByTelegramHandler(c *fiber.Ctx) error {
 
 func (p *Provider) GetWeatherByCityHandler(c *fiber.Ctx) error {
 	var req GetCityRequest
-	if err := c.ParamsParser(&req); err != nil {
+	if err := c.BodyParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := p.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
+	rawBody, err := json.Marshal(req)
+	if err != nil {
+		log.Error(err.Error())
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	
 	body, statusCode, err := p.sendRequest(
 		c.UserContext(),
 		http.MethodGet,
-		fmt.Sprintf("%s/weather/city/%s", p.Host, req.City),
-		nil,
+		fmt.Sprintf("%s/weather/city", p.Host),
+		bytes.NewReader(rawBody),
 	)
 	if err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(statusCode)
 	}
 	return c.Type("json").Send(body)
@@ -148,9 +169,11 @@ func (p *Provider) GetWeatherByCityHandler(c *fiber.Ctx) error {
 func (p *Provider) GetWeatherByTelegramHandler(c *fiber.Ctx) error {
 	var req GetTelegramRequest
 	if err := c.ParamsParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := p.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
@@ -161,6 +184,7 @@ func (p *Provider) GetWeatherByTelegramHandler(c *fiber.Ctx) error {
 		nil,
 	)
 	if err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(statusCode)
 	}
 	return c.Type("json").Send(body)
@@ -168,20 +192,29 @@ func (p *Provider) GetWeatherByTelegramHandler(c *fiber.Ctx) error {
 
 func (p *Provider) GetNewsByCityHandler(c *fiber.Ctx) error {
 	var req GetCityRequest
-	if err := c.ParamsParser(&req); err != nil {
+	if err := c.BodyParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := p.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	rawBody, err := json.Marshal(req)
+	if err != nil {
+		log.Error(err.Error())
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	body, statusCode, err := p.sendRequest(
 		c.UserContext(),
 		http.MethodGet,
-		fmt.Sprintf("%s/news/city/%s", p.Host, req.City),
-		nil,
+		fmt.Sprintf("%s/news/city/", p.Host),
+		bytes.NewReader(rawBody),
 	)
 	if err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(statusCode)
 	}
 	return c.Type("json").Send(body)
@@ -190,9 +223,11 @@ func (p *Provider) GetNewsByCityHandler(c *fiber.Ctx) error {
 func (p *Provider) GetNewsByTelegramHandler(c *fiber.Ctx) error {
 	var req GetTelegramRequest
 	if err := c.ParamsParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := p.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
@@ -203,6 +238,7 @@ func (p *Provider) GetNewsByTelegramHandler(c *fiber.Ctx) error {
 		nil,
 	)
 	if err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(statusCode)
 	}
 	return c.Type("json").Send(body)
@@ -211,9 +247,11 @@ func (p *Provider) GetNewsByTelegramHandler(c *fiber.Ctx) error {
 func (p *Provider) GetClothesByTelegramHandler(c *fiber.Ctx) error {
 	var req GetTelegramRequest
 	if err := c.ParamsParser(&req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := p.validator.Struct(req); err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
@@ -224,6 +262,7 @@ func (p *Provider) GetClothesByTelegramHandler(c *fiber.Ctx) error {
 		nil,
 	)
 	if err != nil {
+		log.Error(err.Error())
 		return c.SendStatus(statusCode)
 	}
 	return c.Type("json").Send(body)
@@ -235,11 +274,13 @@ func (p *Provider) sendRequest(ctx context.Context, method string, url string, b
 
 	res, err := p.Client.Do(req)
 	if err != nil {
+		log.Error(err.Error())
 		return nil, 0, fmt.Errorf("to send a request: %w", err)
 	}
 	defer res.Body.Close()
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
+		log.Error(err.Error())
 		return nil, 0, fmt.Errorf("to read a body: %w", err)
 	}
 

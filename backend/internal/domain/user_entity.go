@@ -24,7 +24,7 @@ type UserEntity struct {
 	TComfort   int       `json:"t_comfort" gorm:"t_comfort"`
 	TTol       int       `json:"t_tol" gorm:"t_tol"`
 	TPuh       int       `json:"t_puh" gorm:"t_puh"`
-	Temp1      int       `json:"temp1" gorm:"temp1"`
+	Temp1      int       `json:"-" gorm:"temp1"`
 	Temp2      string    `json:"-" gorm:"temp2"`
 	Password   string    `json:"password" gorm:"password"`
 	TelegramID int       `json:"telegram_id" gorm:"telegram_id"`

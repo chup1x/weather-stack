@@ -31,7 +31,7 @@ func NewNewsController(service *newsservice.NewsService, users newsUserProvider)
 
 func (cn *newsController) GetNewsHandler(c *fiber.Ctx) error {
 	var req GetNewsRequest
-	if err := c.ParamsParser(&req); err != nil {
+	if err := c.BodyParser(&req); err != nil {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
@@ -39,7 +39,7 @@ func (cn *newsController) GetNewsHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	news, err := cn.s.GetNews(c.UserContext(), req.CityID)
+	news, err := cn.s.GetNews(c.UserContext(), req.City)
 	if err != nil {
 		if errors.Is(err, domain.NewsNotFound) {
 			return c.SendStatus(fiber.StatusNotFound)

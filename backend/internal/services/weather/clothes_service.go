@@ -99,9 +99,9 @@ func (s *ClothesService) GetClothes(ctx context.Context, telegramID int) (map[st
 func buildClothesCode(user *domain.UserEntity, weather *domain.WeatherEntity) string {
 	// user prefs: comf (t-shirt), tol (hoodie), puh (jacket)
 	p1 := bucket(user.TComfort, 30, 2, 15)
-	p2 := bucket(user.TTol, 30, 4, 15)
-	p3 := bucket(user.TPuh, 30, 4, 15)
-	weatherCode := bucket(int(weather.Temperature), 60, 3, 20)
+	p2 := bucket(user.TTol, 24, 4, 15)
+	p3 := bucket(user.TPuh, 18, 4, 15)
+	weatherCode := bucket(int(weather.Temperature), 30, 3, 20)
 	return fmt.Sprintf("%02d%02d%02d%02d", p1, p2, p3, weatherCode)
 }
 

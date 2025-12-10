@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"log"
 
 	"github.com/chup1x/weather-stack/internal/config"
 )
@@ -34,7 +35,7 @@ func NewLLMClient(cfg config.LLMConfig) llmClient {
 
 	timeout := time.Duration(cfg.TimeoutSec) * time.Second
 	if timeout <= 0 {
-		timeout = 10 * time.Second
+		timeout = 50 * time.Second
 	}
 
 	return &openAILLM{
@@ -67,15 +68,26 @@ type openAILLM struct {
 func (c *openAILLM) Enabled() bool { return true }
 
 func (c *openAILLM) RecommendClothes(ctx context.Context, in llmClothesInput) (string, error) {
-	systemPrompt := "Ты стилист, даешь краткие рекомендации по одежде, учитывая температуру, описание погоды, влажность и ветер. Отвечай по-русски."
-
+	systemPrompt := "Ты — помощник по подбору одежды по погоде. Отвечай кратко и по делу на русском языке."
+	
 	userLines := []string{
-		fmt.Sprintf("Город: %s", in.City),
-		fmt.Sprintf("Температура: %.1f°C, описание: %s", in.Temperature, in.Description),
-		fmt.Sprintf("Влажность: %.0f%%, ветер: %.1f м/с", in.Humidity, in.WindSpeed),
-	}
-	if len(in.UserTemps) > 0 {
-		userLines = append(userLines, fmt.Sprintf("Предпочтения пользователя (футболка/толстовка/пуховик): %v", in.UserTemps))
+		fmt.Sprint("Ты — полезный ассистент, который дает рекомендации по выбору одежды исходя из погодных условий."),
+		fmt.Sprint("Погода:"),
+		fmt.Sprintf("- Город: %s", in.City),
+		fmt.Sprintf("- Температура: %.1f°C, описание: %s", in.Temperature, in.Description),
+		fmt.Sprintf("- Влажность: %.0f%%, ветер: %.1f м/с", in.Humidity, in.WindSpeed),
+		fmt.Sprint("Персональные температурные предпочтения пользователя:"),
+		fmt.Sprintf("- Комфортная температура в футболке: %s°C", in.UserTemps["comf"]),
+		fmt.Sprintf("- Комфортная температура в толстовке: %s°C", in.UserTemps["tol"]),
+		fmt.Sprintf("- Комфортная температура в пуховике: %s°C", in.UserTemps["puh"]),
+		fmt.Sprint("Учти эти персональные предпочтения при составлении рекомендаций."),
+		fmt.Sprint("Проанализируй погодные условия и дай практичные рекомендации по одежде. Учитывай температуру, осадки, влажность и ветер."),
+		fmt.Sprint("Ответь в следующем формате:"),
+		fmt.Sprint("- Основная одежда: [рекомендация по верхней одежде]"),
+		fmt.Sprint("- Обувь: [рекомендация по обуви]"),
+		fmt.Sprint("- Аксессуары: [рекомендация по аксессуарам]"),
+		fmt.Sprint("- Общий совет: [краткое итоговое замечание]"),
+		fmt.Sprint("Будь кратким и практичным, отвечай на русском языке:"),
 	}
 
 	payload := map[string]any{
@@ -99,11 +111,13 @@ func (c *openAILLM) RecommendClothes(ctx context.Context, in llmClothesInput) (s
 
 	res, err := c.client.Do(req)
 	if err != nil {
+		log.Println(err)
 		return "", fmt.Errorf("do llm request: %w", err)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		log.Printf("llm request failed: status %d", res.StatusCode)
 		return "", fmt.Errorf("llm request failed: status %d", res.StatusCode)
 	}
 
@@ -116,10 +130,12 @@ func (c *openAILLM) RecommendClothes(ctx context.Context, in llmClothesInput) (s
 	}{}
 
 	if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
+		log.Println(err)
 		return "", fmt.Errorf("decode llm response: %w", err)
 	}
 
 	if len(body.Choices) == 0 {
+		log.Println("llm response empty")
 		return "", errors.New("llm response empty")
 	}
 

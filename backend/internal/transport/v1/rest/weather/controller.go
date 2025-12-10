@@ -57,14 +57,15 @@ func (cn *weatherController) CreateWeatherRecordHandler(c *fiber.Ctx) error {
 
 func (cn *weatherController) GetWeatherHandler(c *fiber.Ctx) error {
 	var req GetWeatherHistoryRequest
-	if err := c.ParamsParser(&req); err != nil {
+	if err := c.BodyParser(&req); err != nil {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 	if err := cn.validator.Struct(req); err != nil {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	city, err := cn.s.GetWeatherWithCache(c.UserContext(), req.ID)
+
+	city, err := cn.s.GetWeatherWithCache(c.UserContext(), req.City)
 	if err != nil {
 		if errors.Is(err, domain.ErrWeatherNotFound) {
 			return c.SendStatus(fiber.StatusNotFound)
