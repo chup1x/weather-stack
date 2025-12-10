@@ -25,7 +25,7 @@ func New(host string) *Provider {
 		Host:      host,
 		validator: validator.New(),
 		Client: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: 60 * time.Second,
 		},
 	}
 }

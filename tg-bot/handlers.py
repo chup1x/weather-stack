@@ -41,7 +41,7 @@ async def profile_command(update, context):
     user = update.effective_user
     logger.info(f"Запрос профиля {user.id}")
 
-    profile = cnst.get_user_profile(user.id)
+    profile = await cnst.get_user_profile(user.id)
     if not profile:
         await update.message.reply_text("Вы не зарегистрированы. Используйте /start для регистрации.")
         return
@@ -120,8 +120,8 @@ async def clothes_command(update, context):
 
     user_id = user.id
     if context.user_data.get("registration") != user_id:
-        if cnst.user_exists(user_id):
-            status, data = req.get_clothes_with_profile(user_id)
+        if await cnst.user_exists(user_id):
+            status, data = await req.get_clothes_with_profile(user_id)
             if status == 200 and isinstance(data, dict):
                 await update.message.reply_text(_render_clothes_message(data))
             else:
@@ -259,9 +259,9 @@ async def weather_command(update, context):
     user_id = user.id
     logger.info(f"Запрос погоды от {user_id}")
 
-    if cnst.user_exists(user_id):
+    if await cnst.user_exists(user_id):
         
-        status, data = req.get_weather_with_profile(user_id)
+        status, data = await req.get_weather_with_profile(user_id)
         response = await weather_decode(status, data)
         await update.message.reply_text(response)
         return ConversationHandler.END
@@ -272,7 +272,7 @@ async def weather_command(update, context):
 
 async def weather_by_city(update, context):
     city = update.message.text.strip()
-    status, data = req.get_weather(city)
+    status, data = await req.get_weather(city)
     response = await weather_decode(status, data)
     await update.message.reply_text(response)
     return ConversationHandler.END
@@ -299,8 +299,8 @@ async def news_command(update, context):
     user_id = user.id
     logger.info(f"Запрос новостей от {user_id}")
 
-    if cnst.user_exists(user_id):
-        status, data = req.get_news_by_profile(user_id)
+    if await cnst.user_exists(user_id):
+        status, data = await req.get_news_by_profile(user_id)
         response = await news_decode(status, data)
         await update.message.reply_text(response)
         return ConversationHandler.END
@@ -311,7 +311,7 @@ async def news_command(update, context):
 
 async def news_by_city(update, context):
     city = update.message.text.strip()
-    status, data = req.get_news(city)
+    status, data = await req.get_news(city)
     response = await news_decode(status, data)
     await update.message.reply_text(response)
     return ConversationHandler.END

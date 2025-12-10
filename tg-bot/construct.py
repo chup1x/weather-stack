@@ -27,21 +27,21 @@ async def register(message, data) -> bool:
     )
     welcome_msg_local+= welcome_msg
 
-    if user_exists(user_id): 
+    if await user_exists(user_id): 
         logger.warning(f"{user_id} уже зарегистрирован")
         return False
 
     try:
         data[0] = username
         logger.debug(f"отправка данных регистрации для {user_id}: {data}")
-        r = req.post_register_user(user_id, data[:])
+        r = await req.post_register_user(user_id, data[:])
         
         if r.status_code != 200:
             logger.error(f"ошибка регистрации: статус {r.status_code}")
             raise AssertionError(f"HTTP {r.status_code}")
         else:
             logger.debug("регистрация успешна, запрос профиля")
-            r2 = req.get_user_profile(user_id)
+            r2 = await req.get_user_profile(user_id)
             try:
                 assert r2[0] == 200
                 logger.success(f"{username} успешно зарегистрирован")
@@ -60,11 +60,11 @@ async def register(message, data) -> bool:
         await message.reply_text(welcome_msg_error)
         return False
 
-def user_exists(user_id: str) -> bool:
+async def user_exists(user_id: str) -> bool:
     logger.debug(f"проверка существования {user_id}")
     
     try:
-        r2 = req.get_user_profile(user_id)
+        r2 = await req.get_user_profile(user_id)
         if r2[0] == 200:
             logger.debug(f"{user_id} существует")
             return True
@@ -77,11 +77,11 @@ def user_exists(user_id: str) -> bool:
         logger.error(f"Неизвестная ошибка при проверке пользователя: {e}")
         return False
 
-def get_user_profile(user_id):
+async def get_user_profile(user_id):
     logger.debug(f"запрос профиля {user_id}")
     
     try:
-        r2 = req.get_user_profile(user_id)
+        r2 = await req.get_user_profile(user_id)
         if r2[0] == 200:
             logger.debug(f"профиль {user_id} получен из апи")
             return r2[1]
