@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"time"
-	"fmt"
 
 	"github.com/chup1x/weather-stack/internal/domain"
 	"gorm.io/gorm"
@@ -21,7 +20,6 @@ func NewNewsRepository(db *gorm.DB) *newsRepository {
 }
 
 func (r *newsRepository) CreateNewsRequest(ctx context.Context, new *domain.NewsEntity) error {
-	fmt.Print(new.CityID)
 	return r.db.WithContext(ctx).
 		Table("news").
 		Clauses(clause.OnConflict{

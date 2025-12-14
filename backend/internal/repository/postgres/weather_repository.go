@@ -7,6 +7,7 @@ import (
 
 	"github.com/chup1x/weather-stack/internal/domain"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type WeatherRepository struct {
@@ -18,7 +19,13 @@ func NewWeatherRepository(db *gorm.DB) *WeatherRepository {
 }
 
 func (r *WeatherRepository) CreateWeatherRequest(ctx context.Context, new *domain.WeatherEntity) error {
-	return r.db.WithContext(ctx).Table("weather_requests").Create(new).Error
+	return r.db.WithContext(ctx).
+		Table("weather_requests").
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "city_id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"temperature", "feels_like", "description", "humidity", "pressure", "wind_speed", "created_at"}),
+		}).
+		Create(new).Error
 }
 
 func (r *WeatherRepository) GetWeatherByCity(ctx context.Context, city string) (*domain.WeatherEntity, error) {
@@ -39,15 +46,3 @@ func (r *WeatherRepository) GetWeatherByCity(ctx context.Context, city string) (
 
 	return weather, nil
 }
-
-/*
-	func (r *WeatherRepository) GetClothesByComb(ctx context.Context, id int) ([]*domain.WeatherClothesEntity, error) {
-		clothes := []*domain.WeatherClothesEntity{}
-
-		if err := r.db.WithContext(ctx).Table("clothes").Where("id = ?", id).First(clothes).Error; err != nil {
-			return nil, err
-		}
-
-		return clothes, nil
-	}
-*/

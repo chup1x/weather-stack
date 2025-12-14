@@ -1,8 +1,7 @@
 from loguru import logger
 import os
 import requests_async as requests
-from dotenv import load_dotenv
-load_dotenv()
+
 url = os.getenv("BASE_URL")
 
 async def post_register_user(usr_id: str, data):
@@ -11,7 +10,7 @@ async def post_register_user(usr_id: str, data):
     payload = {
         "name": str(data[0]),
         "sex": "male",
-        "age": 69,
+        "age": 25,
         "city_n": str(data[1]),
         "city_w": str(data[5]),
         "drop_time": str(data[6]),
