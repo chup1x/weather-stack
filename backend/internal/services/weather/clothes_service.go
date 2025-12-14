@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -65,7 +66,9 @@ func (s *ClothesService) GetClothes(ctx context.Context, telegramID int) (map[st
 			if jsonErr := json.Unmarshal(body, &out); jsonErr == nil {
 				return out, nil
 			}
+			log.Println(out)
 		}
+		log.Println(readErr)
 	}
 
 	recommendation := map[string]any{}
@@ -97,7 +100,6 @@ func (s *ClothesService) GetClothes(ctx context.Context, telegramID int) (map[st
 }
 
 func buildClothesCode(user *domain.UserEntity, weather *domain.WeatherEntity) string {
-	// user prefs: comf (t-shirt), tol (hoodie), puh (jacket)
 	p1 := bucket(user.TComfort, 30, 2, 15)
 	p2 := bucket(user.TTol, 24, 4, 15)
 	p3 := bucket(user.TPuh, 18, 4, 15)
